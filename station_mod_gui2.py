@@ -4,7 +4,7 @@ import tkMessageBox as tkM
 import ScrolledText
 import pickle
 import os
-import station_module as sm
+#import station_module as sm
 from tkFileDialog import askopenfilename as pickfile
 import json
 
@@ -503,12 +503,13 @@ class station_mod_gui2(object):
 
 
     def __init__(self):
+        print 1
         self.phaseList = []
         root = tk.Tk()
         root.title("NIPA Analysis")
-        tk.Label(root, text = "Please select what type of analysis you will be conducting. \nIf you need to analyze only one station's data, then select that button. \nOtherwise select the multiple station button.").grid(row = 0, column =0)
+        tk.Label(root, text = "Please select what type of analysis you will be conducting. \nIf you need to analyze only one station's data, then select that button. \nOtherwise select the multiple station button.").pack()
         binit1 = tk.Button(root, text = "Single Station", command = self.singleStation).pack()
-        binit2 = tk.Button(root, text = "Multiple Stations", command = self.multipleStation).pack()
+        binit2 = tk.Button(root, text = "Multiple Stations", command = self.multipleStations).pack()
         root.mainloop()
 
 
