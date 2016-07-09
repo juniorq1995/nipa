@@ -7,7 +7,7 @@ from os import environ as EV
 from matplotlib import cm ,rcParams, pyplot as plt
 from climdiv_data import *
 from atmos_ocean_data import *
-from dw import *
+#from dw import *
 from station_module import *
 from numpy import isnan, sum, zeros
 from extremes import bootstrp
