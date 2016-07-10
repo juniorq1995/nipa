@@ -503,7 +503,6 @@ class station_mod_gui2(object):
 
 
     def __init__(self):
-        print 1
         self.phaseList = []
         root = tk.Tk()
         root.title("NIPA Analysis")

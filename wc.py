@@ -1,3 +1,4 @@
+#! /Users/jquintero/anaconda/bin/python
 import matplotlib as mpl
 #mpl.use('tkagg')
 import pandas as pd
@@ -7,7 +8,7 @@ from os import environ as EV
 from matplotlib import cm ,rcParams, pyplot as plt
 from climdiv_data import *
 from atmos_ocean_data import *
-#from dw import *
+from dw import *
 from station_module import *
 from numpy import isnan, sum, zeros
 from extremes import bootstrp
@@ -83,7 +84,7 @@ if __name__ == '__main__':
             station.threshold(thresholds)
             station.otherstatistics()
             stations.append(station)
-            print np.sum(np.isnan(station.data))
+            #print np.sum(np.isnan(station.data))
 	def mean_0(stations):
 		for station in stations:
 		    print station.phase
