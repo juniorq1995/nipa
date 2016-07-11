@@ -41,7 +41,7 @@ if __name__ == '__main__':
                             slp_lag = slp_lag, n_mon_slp = n_mon_slp, \
                             climdiv_startyr = startyr, n_yrs = n_yrs, \
                             )
-    season = 'MAM'
+    #season = 'MAM'
     mei, phaseind = create_phase_index(**kwgroups['mei'])
 
     base_fp = EV['GHCND_HCN']

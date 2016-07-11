@@ -1,46 +1,66 @@
 #! /Users/jquintero/anaconda/bin/python
 import Tkinter as tk
+import tkMessageBox as tkM
 import matplotlib as mpl
-#mpl.use('tkagg')
-import pandas as pd
-import numpy as np
-import os, math, time
-from os import environ as EV
-from matplotlib import cm ,rcParams, pyplot as plt
-from climdiv_data import *
-from atmos_ocean_data import *
-from dw import *
-from station_module import *
+import climdiv_data as cd
+import atmos_ocean_data as aod
 from numpy import isnan, sum, zeros
 from extremes import bootstrp
-import wc as wc
-#parameters -->
-    #division ('Northeast')
-    #number of years (50)
-    #start year (1945)
-    #end year = start year + (number of years-1)
-    #number of months sst
-    #number of months mei
-    #mei lag
-    #sst lag
-    #slp lag
-    #number of months slp
-    #months (dictionary)
-    #bounds (dictionary)
-#make kwgroups ffrom these parameters
-    #variable name
-    #threshold list
-#button options
-        #add threshold
-        #calculate
-        #displays
-            #mean_0
-            #std_0
-            #gev_0
-            #gamma_0
+import os, math, time
+import numpy as np
+from os import environ as EV
+from matplotlib import cm ,rcParams, pyplot as plt
+import station_module as sm
+import dw as dw
+
 class dw_gui(object):
 #threshold list is shared amongst phases
 #move to interact window
+    def mean_0(stations):
+		for station in stations:
+		    print station.phase
+		    print np.sum(~np.isnan(station.Tdata['0'])).mean()
+		return
+
+    def std_0(stations):
+        for station in stations:
+		    print station.phase
+		    print np.sum(~np.isnan(station.Tdata['0'])).std()
+        return
+
+	def gev_0(stations):
+		from scipy.stats import genextreme as gev
+		ax = plt.subplot()
+		lim = 200
+		for station in stations:
+			data = station.data
+			x = data[data > lim].values.ravel()
+			x = x[~isnan(x)]
+			shp, loc, scl = gev.fit(x)
+			p_x = np.arange(0, x.max() + 100, 0.1)
+			pdf = gev.pdf(p_x, shp, loc = loc, scale = scl)
+			ax.plot(p_x, pdf, label = station.phase)
+		plt.legend()
+		plt.show()
+		return
+
+	def gamma_0(stations):
+		from scipy.stats import gamma
+		ax = plt.subplot()
+		lim = 0
+		for station in stations:
+			data = station.data
+			x = data[data>0].values.ravel()
+			x = x[~isnan(x)]
+			print len(x)
+			shp, loc, scl = gamma.fit(x, floc = 0)
+			p_x = np.arange(0, 500, 0.1)
+			pdf = gamma.pdf(p_x, shp, scale = scl)
+			ax.plot(p_x, pdf, label = station.phase)
+		plt.legend()
+		plt.show()
+		return
+
     def displayPhaseTerminal(self, ref):
         print "\nPhase", ":", ref.phase
 
@@ -108,13 +128,15 @@ class dw_gui(object):
         ps = tk.Tk()
         ps.title("Pick the Station ID for this phase")
         tk.Label(ps, text = "The format should be: 'USC00410832'(no spacing)").grid(row = 0, column = 2)
-
+        typeString = StringVar()
+        typeString.set("")
         bs1 = tk.Button(ps, text = "Get Station ID from Filename", command = lambda:self.pickStationUpload(ps))
-        fs1 = tk.Frame(ps)
-        es1 = tk.Entry(fs1).pack(side = tk.RIGHT)
+        es1 = tk.Entry(app, textvariable = typeString).pack(side = tk.RIGHT)
         bs2 = tk.Button(fs1, text = "Type in Station ID", command = lambda:self.typeStation(es1.get(), ps)).pack(side = tk.LEFT)
+
         fs1.grid(row = 1, column = 2)
         bs1.grid(row = 1, column = 0)
+
         ps.mainloop()
 
     def typeStation(self, station_string, caller):
@@ -195,6 +217,7 @@ class dw_gui(object):
             self.LN_years = ylist
 
     def interact(self, caller):
+        #add 4 buttons to use the 4 methods at the  top
         caller.destroy()
         play = tk.Tk()
         #play.geometry("500x100")
@@ -332,13 +355,22 @@ class dw_gui(object):
 
                 button4_10 = tk.Button(thresh_frame4_10, text = "Add Threshold", width = 10, command = lambda:self.addThreshold(int(entry4_10.get()), self.LN)).pack(side = tk.RIGHT)
 
+                button_mean_0 = tk.Button(play, text = "Mean_0", width = 10,  command = lambda:mean_0(self.phases))
+                button_mean_0.gid(row = 0, column = 4)
+
+                button_std_0 = tk.Button(play, text = "STD_0", width = 10, command = lambda:std_0(self.phases))
+                button_std_0.grid(row = 1, column = 4)
+
+                button_gev_0 = t.Button(play, text = "Gev_0", width = 10, command = lambda:gev_0(self.phases))
+                button_gev_0.grid(row = 2, column = 4)
+
+                button_gamma_0 = tk.Button(play, text = "Gamma_0", width = 10, command = lambda:gamma_0(self.phases))
+                button_gamma_0.grid(row = 3, column = 4)
+
+
         play.mainloop()
 
     def calculate(self):
-        load = tk.Tk()
-        load.title("Calculating...")
-        load.geometry("500x100")
-        tk.Label(load, text = "Please wait for the program to complete").pack()
 
         NIPAdata = []
         if 'MAMJ'== self.sFiles.get():
@@ -379,6 +411,10 @@ class dw_gui(object):
                 return
             else:
                 NIPAdata.append(('La Nina', self.season, self.LN_years))
+        load = tk.Tk()
+        load.title("Calculating...")
+        load.geometry("500x100")
+        tk.Label(load, text = "Please wait for the program to complete").pack()
 
         self.phases = []
         for data in NIPAdata:
@@ -405,6 +441,45 @@ class dw_gui(object):
                 self.LN = item
                 self.phaseList.append('LN')
 
+            #kw calculations
+            self.division = division.get()
+            self.numberYears = (int)(numberYears.get())
+            self.startYear = (int)(startYear.get())
+            self.endYear = self.startYear + (self.numberYears-1)
+            self.numberMonthsSST = (int)(noMoSST.get())
+            self.numberMonthsMEI = (int)(noMoMEI.get())
+            self.numberMonthsSLP = (int)(noMoSLP.get())
+            self.mei_log = mei_log.get()
+            self.sst_log = sst_log.get()
+            self.slp_log = slp_log.get()
+            '''
+            months = {'MAM' : [3, 4, 5]}
+            bounds = {'Texas-06' : [30, 32.5, -102, -97], \
+                        'Texas-09': [28, 30, -101, -96],
+        				'Northeast': [39, 41, -76.5, -75.5]}
+
+            kwgroups = cd.create_kwgroups(    climdiv_months = months['MAM'], \
+                                    sst_lag = self.sst_lag, n_mon_sst = self.numberMonthsSST, \
+                                    mei_lag = self.mei_lag, n_mon_mei = self.numberMonthsMEI, \
+                                    slp_lag = self.slp_lag, n_mon_slp = self.numberMonthsSLP, \
+                                    climdiv_startyr = self.startYear, n_yrs = n_yrs, \
+                                    )
+            #season = 'MAM'
+            mei, phaseind = cd.create_phase_index(**kwgroups['mei'])
+
+            base_fp = EV['GHCND_HCN']
+
+            year_list = np.arange(startyr, endyr + 1)
+
+            lat = (bounds[div][0], bounds[div][1])
+            lon = (bounds[div][2], bounds[div][3])
+
+            year_lim = (year_list.min(), \
+                        year_list.max())
+
+            station_info = dw.extract_stations(var = self.var, years = year_lim,
+                                            lat = lat, lon = lon)
+            '''
             self.interact(load)
             load.mainloop()
 
@@ -514,55 +589,57 @@ class dw_gui(object):
         thresh4 = tk.Button(app, text = "Threshold(s)", command = self.pickThreshold)
         thresh4.grid(row = 3,column = 5, sticky = tk.W)
 
-        tk.Label(app, text="Division").grid(row=4,column=0, sticky=tk.W)
+        tk.Label(app, text="Division").grid(row=4,column=0, sticky=tk.E)
 
         division =  tk.Entry(app)
         division.grid(row = 4, column = 1, sticky = tk.W)
-        '''
-        tk.Label(app, text="Number of Years").grid(row=5,column=0, sticky=tk.W)
+        tk.Label(app, text="Number of Years").grid(row=5,column=0, sticky=tk.E)
 
-        noYears =  tk.Entry(app)
-        noYears.grid(row = 5, column = 1, sticky = tk.W)
+        numberYears =  tk.Entry(app)
+        numberYears.grid(row = 5, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="Start Year").grid(row=6,column=0, sticky=tk.W)
+        tk.Label(app, text="Start Year").grid(row=6,column=0, sticky=tk.E)
 
         startYear =  tk.Entry(app)
         startYear.grid(row = 6, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="Number of Months SST").grid(row=7,column=0, sticky=tk.W)
+        tk.Label(app, text="Number of Months SST").grid(row=7,column=0, sticky=tk.E)
 
         noMoSST =  tk.Entry(app)
         noMoSST.grid(row = 7, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="Number of Months MEI").grid(row=8,column=0, sticky=tk.W)
+        tk.Label(app, text="Number of Months MEI").grid(row=8,column=0, sticky=tk.E)
 
         noMoMEI =  tk.Entry(app)
         noMoMEI.grid(row = 8, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="Number of Months SLP").grid(row=9,column=0, sticky=tk.W)
+        tk.Label(app, text="Number of Months SLP").grid(row=9,column=0, sticky=tk.E)
 
         noMoSLP =  tk.Entry(app)
         noMoSLP.grid(row = 9, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="MEI Log").grid(row=10,column=0, sticky=tk.W)
+        tk.Label(app, text="MEI Log").grid(row=10,column=0, sticky=tk.E)
 
         mei_log =  tk.Entry(app)
         mei_log.grid(row = 10, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="SST Log").grid(row=11,column=0, sticky=tk.W)
+        tk.Label(app, text="SST Log").grid(row=11,column=0, sticky=tk.E)
 
         sst_log =  tk.Entry(app)
         sst_log.grid(row = 11, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="SLP Log").grid(row=12,column=0, sticky=tk.W)
+        tk.Label(app, text="SLP Log").grid(row=12,column=0, sticky=tk.E)
 
         slp_log =  tk.Entry(app)
         slp_log.grid(row = 12, column = 1, sticky = tk.W)
-        '''
+
         submit = tk.Button(app, text = "Submit", command = self.calculate)
-        submit.grid(row = 5,column = 5,sticky = tk.E)
+        submit.grid(row = 12,column = 5,sticky = tk.E)
 
         app.mainloop()
 
 if __name__ == '__main__':
     gui = dw_gui()
+#2 more things
+# need bounds dict and separate months entry for kwgroups(select 3 months instead of 4!!!)
+# when you hit submit a separate window pops up with the options, or hav buttons on same window
