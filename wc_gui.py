@@ -127,16 +127,15 @@ class dw_gui(object):
     def pickStation(self):
         ps = tk.Tk()
         ps.title("Pick the Station ID for this phase")
-        tk.Label(ps, text = "The format should be: 'USC00410832'(no spacing)").grid(row = 0, column = 2)
-        typeString = StringVar()
-        typeString.set("")
+        tk.Label(ps, text = "The format should be: 'USC00011084'(no spacing)").grid(row = 0, column = 2)
+        es1Var = tk.StringVar(ps)
+        es1Var.set("USC00011084")
         bs1 = tk.Button(ps, text = "Get Station ID from Filename", command = lambda:self.pickStationUpload(ps))
-        es1 = tk.Entry(app, textvariable = typeString).pack(side = tk.RIGHT)
-        bs2 = tk.Button(fs1, text = "Type in Station ID", command = lambda:self.typeStation(es1.get(), ps)).pack(side = tk.LEFT)
-
+        fs1 = tk.Frame(ps)
+        es1 = tk.Entry(fs1, textvariable = es1Var).pack(side = tk.RIGHT)
+        bs2 = tk.Button(fs1, text = "Type in Station ID", command = lambda:self.typeStation(es1Var.get(), ps)).pack(side = tk.LEFT)
         fs1.grid(row = 1, column = 2)
         bs1.grid(row = 1, column = 0)
-
         ps.mainloop()
 
     def typeStation(self, station_string, caller):
@@ -442,17 +441,17 @@ class dw_gui(object):
                 self.phaseList.append('LN')
 
             #kw calculations
-            self.division = division.get()
-            self.numberYears = (int)(numberYears.get())
-            self.startYear = (int)(startYear.get())
+            self.division = divisionVar.get()
+            self.numberYears = (int)(numberYearsVar.get())
+            self.startYear = (int)(startYearVar.get())
             self.endYear = self.startYear + (self.numberYears-1)
-            self.numberMonthsSST = (int)(noMoSST.get())
-            self.numberMonthsMEI = (int)(noMoMEI.get())
-            self.numberMonthsSLP = (int)(noMoSLP.get())
-            self.mei_log = mei_log.get()
-            self.sst_log = sst_log.get()
-            self.slp_log = slp_log.get()
-            '''
+            self.numberMonthsSST = (int)(noMoSSTVar.get())
+            self.numberMonthsMEI = (int)(noMoMEIVar.get())
+            self.numberMonthsSLP = (int)(noMoSLPVar.get())
+            self.mei_log = mei_logVar.get()
+            self.sst_log = sst_logVar.get()
+            self.slp_log = slp_logVar.get()
+
             months = {'MAM' : [3, 4, 5]}
             bounds = {'Texas-06' : [30, 32.5, -102, -97], \
                         'Texas-09': [28, 30, -101, -96],
@@ -479,7 +478,7 @@ class dw_gui(object):
 
             station_info = dw.extract_stations(var = self.var, years = year_lim,
                                             lat = lat, lon = lon)
-            '''
+
             self.interact(load)
             load.mainloop()
 
@@ -590,48 +589,58 @@ class dw_gui(object):
         thresh4.grid(row = 3,column = 5, sticky = tk.W)
 
         tk.Label(app, text="Division").grid(row=4,column=0, sticky=tk.E)
-
-        division =  tk.Entry(app)
+        divisionVar = tk.StringVar(app)
+        divisionVar.set("Northeast")
+        division =  tk.Entry(app, textvariable = divisionVar)
         division.grid(row = 4, column = 1, sticky = tk.W)
-        tk.Label(app, text="Number of Years").grid(row=5,column=0, sticky=tk.E)
 
-        numberYears =  tk.Entry(app)
+        tk.Label(app, text="Number of Years").grid(row=5,column=0, sticky=tk.E)
+        numberYearsVar = tk.StringVar(app)
+        numberYearsVar.set("50")
+        numberYears =  tk.Entry(app, textvariable = numberYearsVar)
         numberYears.grid(row = 5, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Start Year").grid(row=6,column=0, sticky=tk.E)
-
-        startYear =  tk.Entry(app)
+        startYearVar = tk.StringVar(app)
+        startYearVar.set("1945")
+        startYear =  tk.Entry(app, textvariable = startYearVar)
         startYear.grid(row = 6, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Number of Months SST").grid(row=7,column=0, sticky=tk.E)
-
-        noMoSST =  tk.Entry(app)
+        noMoSSTVar = tk.StringVar(app)
+        noMoSSTVar.set("3")
+        noMoSST =  tk.Entry(app, textvariable = noMoSSTVar)
         noMoSST.grid(row = 7, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Number of Months MEI").grid(row=8,column=0, sticky=tk.E)
-
-        noMoMEI =  tk.Entry(app)
+        noMoMEIVar = tk.StringVar(app)
+        noMoMEIVar.set("3")
+        noMoMEI =  tk.Entry(app, textvariable = noMoMEIVar)
         noMoMEI.grid(row = 8, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Number of Months SLP").grid(row=9,column=0, sticky=tk.E)
-
-        noMoSLP =  tk.Entry(app)
+        noMoSLPVar = tk.StringVar(app)
+        noMoSLPVar.set("2")
+        noMoSLP =  tk.Entry(app, textvariable = noMoSLPVar)
         noMoSLP.grid(row = 9, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="MEI Log").grid(row=10,column=0, sticky=tk.E)
+        tk.Label(app, text="MEI Lag").grid(row=10,column=0, sticky=tk.E)
+        mei_lagVar = tk.StringVar(app)
+        mei_lagVar.set("3")
+        mei_lag =  tk.Entry(app, textvariable = mei_lagVar)
+        mei_lag.grid(row = 10, column = 1, sticky = tk.W)
 
-        mei_log =  tk.Entry(app)
-        mei_log.grid(row = 10, column = 1, sticky = tk.W)
+        tk.Label(app, text="SST Lag").grid(row=11,column=0, sticky=tk.E)
+        sst_lagVar = tk.StringVar(app)
+        sst_lagVar.set("3")
+        sst_lag =  tk.Entry(app, textvariable = sst_lagVar)
+        sst_lag.grid(row = 11, column = 1, sticky = tk.W)
 
-        tk.Label(app, text="SST Log").grid(row=11,column=0, sticky=tk.E)
-
-        sst_log =  tk.Entry(app)
-        sst_log.grid(row = 11, column = 1, sticky = tk.W)
-
-        tk.Label(app, text="SLP Log").grid(row=12,column=0, sticky=tk.E)
-
-        slp_log =  tk.Entry(app)
-        slp_log.grid(row = 12, column = 1, sticky = tk.W)
+        tk.Label(app, text="SLP Lag").grid(row=12,column=0, sticky=tk.E)
+        slp_lagVar = tk.StringVar(app)
+        slp_lagVar.set("2")
+        slp_lag =  tk.Entry(app, textvariable = slp_lagVar)
+        slp_lag.grid(row = 12, column = 1, sticky = tk.W)
 
         submit = tk.Button(app, text = "Submit", command = self.calculate)
         submit.grid(row = 12,column = 5,sticky = tk.E)
@@ -643,3 +652,7 @@ if __name__ == '__main__':
 #2 more things
 # need bounds dict and separate months entry for kwgroups(select 3 months instead of 4!!!)
 # when you hit submit a separate window pops up with the options, or hav buttons on same window
+#from extremes import bootstrp
+#  File "/Users/jquintero/nipa/extremes.py", line 2, in <module>
+#    from statsmodels.distributions.empirical_distribution import ECDF
+#ImportError: No module named statsmodels.distributions.empirical_distribution
