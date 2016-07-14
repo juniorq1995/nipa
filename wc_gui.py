@@ -16,19 +16,19 @@ import dw as dw
 class dw_gui(object):
 #threshold list is shared amongst phases
 #move to interact window
-    def mean_0(stations):
+    def mean_0(self,stations):
 		for station in stations:
 		    print station.phase
 		    print np.sum(~np.isnan(station.Tdata['0'])).mean()
 		return
 
-    def std_0(stations):
+    def std_0(self,stations):
         for station in stations:
 		    print station.phase
 		    print np.sum(~np.isnan(station.Tdata['0'])).std()
         return
 
-	def gev_0(stations):
+    def gev_0(self,stations):
 		from scipy.stats import genextreme as gev
 		ax = plt.subplot()
 		lim = 200
@@ -44,7 +44,7 @@ class dw_gui(object):
 		plt.show()
 		return
 
-	def gamma_0(stations):
+    def gamma_0(self,stations):
 		from scipy.stats import gamma
 		ax = plt.subplot()
 		lim = 0
@@ -140,7 +140,7 @@ class dw_gui(object):
 
     def typeStation(self, station_string, caller):
         caller.destroy()
-        self.stationID = station_string[0:-1]
+        self.stationID = station_string
 
     def pickStationUpload(self, caller):
         fileName = pickfile(multiple = False)
@@ -164,8 +164,8 @@ class dw_gui(object):
         fo = open(fileName, "r")
         text = fo.read()
         temp = text[0:-1].split(",")
-        for item in temp:
-            threshold_list.append(int(intem))
+        for i, item in temp:
+            temp[i] = int(item)
         fo.close()
         caller.destroy()
         self.thresholds = temp
@@ -184,6 +184,7 @@ class dw_gui(object):
         pyB = tk.Button(py, text = "Upload Year List from File", command = lambda:self.pickYearUpload(phaseYear, py))
         pyB2 = tk.Button(py, text = "Create Year List", command = lambda:self.pickYearCreate(phaseYear, textV3.get("1.0",'end-1c').split(","), py))
         textV3 = tk.Text(py)
+        textV3.insert(tk.INSERT,"1926,1931,1941,1942,1958,1966,1973,1983,1992,1995,1998,2010")
         textV3.grid(row = 1, column = 2)
         pyB.grid(row = 1, column = 0)
         pyB2.grid(row = 2, column = 2)
@@ -223,6 +224,17 @@ class dw_gui(object):
         play.title("Interaction")
 
         for i in self.phaseList:
+            button_mean1_11 = tk.Button(play, text = "Mean_0", width = 10,  command = lambda:self.mean_0(self.phases))
+            button_mean1_11.grid(row = 0, column = 4)
+
+            button_std1_11 = tk.Button(play, text = "STD_0", width = 10, command = lambda:self.std_0(self.phases))
+            button_std1_11.grid(row = 1, column = 4)
+
+            button_gev1_11 = tk.Button(play, text = "Gev_0", width = 10, command = lambda:self.gev_0(self.phases))
+            button_gev1_11.grid(row = 2, column = 4)
+
+            button_gamma1_11 = tk.Button(play, text = "Gamma_0", width = 10, command = lambda:self.gamma_0(self.phases))
+            button_gamma1_11.grid(row = 3, column = 4)
             if i == 'EN':
                 tk.Label(play,text = "El Nino").grid(row = 0, column = 0)
                 button1_2 = tk.Button(play, text = "Months", width = 20, command = lambda:self.displaySeasonTerminal(self.EN))
@@ -354,19 +366,6 @@ class dw_gui(object):
 
                 button4_10 = tk.Button(thresh_frame4_10, text = "Add Threshold", width = 10, command = lambda:self.addThreshold(int(entry4_10.get()), self.LN)).pack(side = tk.RIGHT)
 
-                button_mean_0 = tk.Button(play, text = "Mean_0", width = 10,  command = lambda:mean_0(self.phases))
-                button_mean_0.gid(row = 0, column = 4)
-
-                button_std_0 = tk.Button(play, text = "STD_0", width = 10, command = lambda:std_0(self.phases))
-                button_std_0.grid(row = 1, column = 4)
-
-                button_gev_0 = t.Button(play, text = "Gev_0", width = 10, command = lambda:gev_0(self.phases))
-                button_gev_0.grid(row = 2, column = 4)
-
-                button_gamma_0 = tk.Button(play, text = "Gamma_0", width = 10, command = lambda:gamma_0(self.phases))
-                button_gamma_0.grid(row = 3, column = 4)
-
-
         play.mainloop()
 
     def calculate(self):
@@ -441,16 +440,16 @@ class dw_gui(object):
                 self.phaseList.append('LN')
 
             #kw calculations
-            self.division = divisionVar.get()
-            self.numberYears = (int)(numberYearsVar.get())
-            self.startYear = (int)(startYearVar.get())
-            self.endYear = self.startYear + (self.numberYears-1)
-            self.numberMonthsSST = (int)(noMoSSTVar.get())
-            self.numberMonthsMEI = (int)(noMoMEIVar.get())
-            self.numberMonthsSLP = (int)(noMoSLPVar.get())
-            self.mei_log = mei_logVar.get()
-            self.sst_log = sst_logVar.get()
-            self.slp_log = slp_logVar.get()
+            self.divisionVar = self.divisionVar.get()
+            self.numberYearsVar = (int)(self.numberYearsVar.get())
+            self.startYearVar = (int)(self.startYearVar.get())
+            self.endYear = self.startYearVar + (self.numberYearsVar-1)
+            self.noMoSSTVar = (int)(self.noMoSSTVar.get())
+            self.noMoMEIVar = (int)(self.noMoMEIVar.get())
+            self.noMoSLPVar = (int)(self.noMoSLPVar.get())
+            self.mei_lagVar = (int)(self.mei_lagVar.get())
+            self.sst_lagVar = (int)(self.sst_lagVar.get())
+            self.slp_lagVar = (int)(self.slp_lagVar.get())
 
             months = {'MAM' : [3, 4, 5]}
             bounds = {'Texas-06' : [30, 32.5, -102, -97], \
@@ -458,23 +457,21 @@ class dw_gui(object):
         				'Northeast': [39, 41, -76.5, -75.5]}
 
             kwgroups = cd.create_kwgroups(    climdiv_months = months['MAM'], \
-                                    sst_lag = self.sst_lag, n_mon_sst = self.numberMonthsSST, \
-                                    mei_lag = self.mei_lag, n_mon_mei = self.numberMonthsMEI, \
-                                    slp_lag = self.slp_lag, n_mon_slp = self.numberMonthsSLP, \
-                                    climdiv_startyr = self.startYear, n_yrs = n_yrs, \
-                                    )
+                                    sst_lag = self.sst_lagVar, n_mon_sst = self.noMoSSTVar, \
+                                    mei_lag = self.mei_lagVar, n_mon_mei = self.noMoMEIVar, \
+                                    slp_lag = self.slp_lagVar, n_mon_slp = self.noMoSLPVar, \
+                                    climdiv_startyr = self.startYearVar, n_yrs = self.numberYearsVar)
             #season = 'MAM'
             mei, phaseind = cd.create_phase_index(**kwgroups['mei'])
 
             base_fp = EV['GHCND_HCN']
 
-            year_list = np.arange(startyr, endyr + 1)
+            year_list = np.arange(self.startYearVar, self.endYear + 1)
 
-            lat = (bounds[div][0], bounds[div][1])
-            lon = (bounds[div][2], bounds[div][3])
+            lat = (bounds[self.divisionVar][0], bounds[self.divisionVar][1])
+            lon = (bounds[self.divisionVar][2], bounds[self.divisionVar][3])
 
-            year_lim = (year_list.min(), \
-                        year_list.max())
+            year_lim = (year_list.min(), year_list.max())
 
             station_info = dw.extract_stations(var = self.var, years = year_lim,
                                             lat = lat, lon = lon)
@@ -483,6 +480,7 @@ class dw_gui(object):
             load.mainloop()
 
     def __init__(self):
+        self.thresholds = [0]
         self.phaseList = []
         app = tk.Tk()
         app.title("Single Station Module Fields")
@@ -589,57 +587,57 @@ class dw_gui(object):
         thresh4.grid(row = 3,column = 5, sticky = tk.W)
 
         tk.Label(app, text="Division").grid(row=4,column=0, sticky=tk.E)
-        divisionVar = tk.StringVar(app)
-        divisionVar.set("Northeast")
-        division =  tk.Entry(app, textvariable = divisionVar)
+        self.divisionVar = tk.StringVar(app)
+        self.divisionVar.set("Northeast")
+        division =  tk.Entry(app, textvariable = self.divisionVar)
         division.grid(row = 4, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Number of Years").grid(row=5,column=0, sticky=tk.E)
-        numberYearsVar = tk.StringVar(app)
-        numberYearsVar.set("50")
-        numberYears =  tk.Entry(app, textvariable = numberYearsVar)
+        self.numberYearsVar = tk.StringVar(app)
+        self.numberYearsVar.set("50")
+        numberYears =  tk.Entry(app, textvariable = self.numberYearsVar)
         numberYears.grid(row = 5, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Start Year").grid(row=6,column=0, sticky=tk.E)
-        startYearVar = tk.StringVar(app)
-        startYearVar.set("1945")
-        startYear =  tk.Entry(app, textvariable = startYearVar)
+        self.startYearVar = tk.StringVar(app)
+        self.startYearVar.set("1945")
+        startYear =  tk.Entry(app, textvariable = self.startYearVar)
         startYear.grid(row = 6, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Number of Months SST").grid(row=7,column=0, sticky=tk.E)
-        noMoSSTVar = tk.StringVar(app)
-        noMoSSTVar.set("3")
-        noMoSST =  tk.Entry(app, textvariable = noMoSSTVar)
+        self.noMoSSTVar = tk.StringVar(app)
+        self.noMoSSTVar.set("3")
+        noMoSST =  tk.Entry(app, textvariable = self.noMoSSTVar)
         noMoSST.grid(row = 7, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Number of Months MEI").grid(row=8,column=0, sticky=tk.E)
-        noMoMEIVar = tk.StringVar(app)
-        noMoMEIVar.set("3")
-        noMoMEI =  tk.Entry(app, textvariable = noMoMEIVar)
+        self.noMoMEIVar = tk.StringVar(app)
+        self.noMoMEIVar.set("3")
+        noMoMEI =  tk.Entry(app, textvariable = self.noMoMEIVar)
         noMoMEI.grid(row = 8, column = 1, sticky = tk.W)
 
         tk.Label(app, text="Number of Months SLP").grid(row=9,column=0, sticky=tk.E)
-        noMoSLPVar = tk.StringVar(app)
-        noMoSLPVar.set("2")
-        noMoSLP =  tk.Entry(app, textvariable = noMoSLPVar)
+        self.noMoSLPVar = tk.StringVar(app)
+        self.noMoSLPVar.set("2")
+        noMoSLP =  tk.Entry(app, textvariable = self.noMoSLPVar)
         noMoSLP.grid(row = 9, column = 1, sticky = tk.W)
 
         tk.Label(app, text="MEI Lag").grid(row=10,column=0, sticky=tk.E)
-        mei_lagVar = tk.StringVar(app)
-        mei_lagVar.set("3")
-        mei_lag =  tk.Entry(app, textvariable = mei_lagVar)
+        self.mei_lagVar = tk.StringVar(app)
+        self.mei_lagVar.set("3")
+        mei_lag =  tk.Entry(app, textvariable = self.mei_lagVar)
         mei_lag.grid(row = 10, column = 1, sticky = tk.W)
 
         tk.Label(app, text="SST Lag").grid(row=11,column=0, sticky=tk.E)
-        sst_lagVar = tk.StringVar(app)
-        sst_lagVar.set("3")
-        sst_lag =  tk.Entry(app, textvariable = sst_lagVar)
+        self.sst_lagVar = tk.StringVar(app)
+        self.sst_lagVar.set("3")
+        sst_lag =  tk.Entry(app, textvariable = self.sst_lagVar)
         sst_lag.grid(row = 11, column = 1, sticky = tk.W)
 
         tk.Label(app, text="SLP Lag").grid(row=12,column=0, sticky=tk.E)
-        slp_lagVar = tk.StringVar(app)
-        slp_lagVar.set("2")
-        slp_lag =  tk.Entry(app, textvariable = slp_lagVar)
+        self.slp_lagVar = tk.StringVar(app)
+        self.slp_lagVar.set("2")
+        slp_lag =  tk.Entry(app, textvariable = self.slp_lagVar)
         slp_lag.grid(row = 12, column = 1, sticky = tk.W)
 
         submit = tk.Button(app, text = "Submit", command = self.calculate)
@@ -653,6 +651,7 @@ if __name__ == '__main__':
 # need bounds dict and separate months entry for kwgroups(select 3 months instead of 4!!!)
 # when you hit submit a separate window pops up with the options, or hav buttons on same window
 #from extremes import bootstrp
+
 #  File "/Users/jquintero/nipa/extremes.py", line 2, in <module>
 #    from statsmodels.distributions.empirical_distribution import ECDF
 #ImportError: No module named statsmodels.distributions.empirical_distribution
