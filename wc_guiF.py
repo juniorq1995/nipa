@@ -76,41 +76,31 @@ class dw_gui(object):
 		plt.show()
 		return
 
-    def addThreshold(self):
-
-        thresh = thresh.split(',', 1)
-        for i, item in enumerate(thresh):
-            thresh[i] = int(item)
-        for item in self.thresholds:
-            thresh.append(item)
-        ref.threshold(thresh)
-        ref.otherstatistics()
-
     def grabThresholds(self):
-        self.threshVar = self.threshVar.get().split(",")
+        self.threshVar = self.threshEntryVar.get().split(",")
         for item in self.threshVar:
-            self.thresholds.append(int(item))
+            self.Thresholds.append(int(item))
 
     def grabYears(self):
         self.EN_years = []
-        self.year1 = self.year1.get("1.0",'end-1c').split(",")
-        for item in self.year1:
-            self.EN_years.append(int(item))
+        self.year1 = (self.year1).get("1.0",'end-1c').split(",")
+        for i in self.year1:
+            self.EN_years.append(int(i))
 
         self.NP_years = []
-        self.year2 = self.year2.get("1.0",'end-1c').split(",")
-        for item in self.year2:
-            self.NP_years.append(int(item))
+        self.year2 = (self.year2).get("1.0",'end-1c').split(",")
+        for j in self.year2:
+            self.NP_years.append(int(j))
 
         self.NN_years = []
-        self.year3 = self.year3.get("1.0",'end-1c').split(",")
-        for item in self.year3:
-            self.NN_years.append(int(item))
+        self.year3 = (self.year3).get("1.0",'end-1c').split(",")
+        for k in self.year3:
+            self.NN_years.append(int(k))
 
         self.LN_years = []
-        self.year4 = self.year4.get("1.0",'end-1c').split(",")
-        for item in self.year3:
-            self.LN_years.append(int(item))
+        self.year4 = (self.year4).get("1.0",'end-1c').split(",")
+        for l in self.year4:
+            self.LN_years.append(int(l))
 
     def displayTDataTerminal(self, ref):
         # a dict where each key contains one pandas df
@@ -121,12 +111,13 @@ class dw_gui(object):
         print "\n"
 
     def displayThresholdsTerminal(self):
-        print "\nThresholds", ":", self.thresholds
+        print "\nThresholds", ":", self.Thresholds
 
     def displayDataTerminal(self, ref):
         #ref is the reference for phase data
         print "\nData"
-        print ref.data + "\n"
+        print ref.data
+        print "\n"
 
     def pickStation(self):
         fileName = pickfile(multiple = False)
@@ -200,7 +191,7 @@ class dw_gui(object):
         for data in NIPAdata:
             self.var = self.varFiles.get()
             station = sm.stationDaily(self.var, self.stationID, data)
-            station.threshold(self.thresholds)
+            station.threshold(self.Thresholds)
             station.otherstatistics()
             self.phases.append(station)
 
@@ -244,7 +235,7 @@ class dw_gui(object):
                                             lat = lat, lon = lon)
 
     def __init__(self):
-        self.thresholds = [0]
+        self.Thresholds = [0]
         self.phaseList = []
 
         app = tk.Tk()
@@ -278,9 +269,9 @@ class dw_gui(object):
         seasonDropDown.pack(side = tk.LEFT)
 
         tk.Label(frame1, text="Thresholds").pack(side = tk.LEFT)
-        self.threshVar = tk.StringVar(app)
-        self.threshVar.set("127,254")
-        threshEntry =  tk.Entry(frame1, textvariable = self.threshVar)
+        self.threshEntryVar = tk.StringVar(app)
+        self.threshEntryVar.set("127,254")
+        threshEntry =  tk.Entry(frame1, textvariable = self.threshEntryVar)
         threshEntry.pack(side = tk.LEFT)
 
         frame2 = tk.Frame(frameLeft, bg = "green")
@@ -432,12 +423,6 @@ class dw_gui(object):
 
         button1_9 = tk.Button(frameRight, text = "Display Thresholds", command = self.displayThresholdsTerminal)
         button1_9.grid(row = 7, column = 0)
-
-
-        entry1_10 = tk.Entry(frameRight)
-        button1_10 = tk.Button(frameRight, text = "Add Threshold", width = 10, command = self.addThreshold)
-        entry1_10.grid(row = 9, column = 0)
-        button1_10.grid(row = 8, column = 0)
 
 
 
