@@ -35,7 +35,7 @@ class stationDaily(object):
         #self.n_years = self.years
         ###################################################################
         #_Organize data in a data frame from station data_#################
-        fp = EV['GHCND_HCN'] + '/'+ stationID + '.dly'
+        fp = EV['GHCND_HCN'] + '/'+ self.stationID + '.dly'
         #extracts data
         all_data = extract_ghcn_daily(fp = fp)
         var_data = all_data[var]

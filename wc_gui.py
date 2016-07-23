@@ -12,6 +12,9 @@ from os import environ as EV
 from matplotlib import cm ,rcParams, pyplot as plt
 import station_module as sm
 import dw as dw
+from scipy.stats import genextreme as gev
+from scipy.stats import gamma
+
 
 class dw_gui(object):
 #threshold list is shared amongst phases
@@ -29,23 +32,21 @@ class dw_gui(object):
         return
 
     def gev_0(self,stations):
-		from scipy.stats import genextreme as gev
-		ax = plt.subplot()
-		lim = 200
-		for station in stations:
-			data = station.data
-			x = data[data > lim].values.ravel()
-			x = x[~isnan(x)]
-			shp, loc, scl = gev.fit(x)
-			p_x = np.arange(0, x.max() + 100, 0.1)
-			pdf = gev.pdf(p_x, shp, loc = loc, scale = scl)
-			ax.plot(p_x, pdf, label = station.phase)
-		plt.legend()
-		plt.show()
-		return
+        ax = plt.subplot()
+        lim = 200
+        for station in stations:
+            data = station.data
+            x = data[data > lim].values.ravel()
+            x = x[~isnan(x)]
+            shp, loc, scl = gev.fit(x)
+            p_x = np.arange(0, x.max() + 100, 0.1)
+            pdf = gev.pdf(p_x, shp, loc = loc, scale = scl)
+            ax.plot(p_x, pdf, label = station.phase)
+        plt.legend()
+        plt.show()
+        return
 
     def gamma_0(self,stations):
-		from scipy.stats import gamma
 		ax = plt.subplot()
 		lim = 0
 		for station in stations:
@@ -100,7 +101,7 @@ class dw_gui(object):
         print "\nThreshold Data"
         for key1 in ref.Tdata:
             print key1
-            print key2
+            print ref.Tdata[key1]
 
     def displayThresholdsTerminal(self, ref):
         print "\nThresholds", ":", ref.thresholds
