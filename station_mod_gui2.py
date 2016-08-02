@@ -526,3 +526,19 @@ if __name__ == '__main__':
     #metatrader
     #buy stocks in blocks of 100
     #commission going in and gong ot, need to do bgger deals to make [rofit
+
+'''
+    Exception in Tkinter callback
+Traceback (most recent call last):
+  File "/Users/jquintero/anaconda/lib/python2.7/lib-tk/Tkinter.py", line 1537, in __call__
+    return self.func(*args)
+  File "/Users/jquintero/nipa/wc_guiF.py", line 193, in calculate
+    station = sm.stationDaily(self.var, self.stationID, data)
+  File "/Users/jquintero/nipa/station_module.py", line 49, in __init__
+    data = np.concatenate((data, var_data[index].values))
+  File "/Users/jquintero/anaconda/lib/python2.7/site-packages/pandas/core/series.py", line 583, in __getitem__
+    result = self.index.get_value(self, key)
+  File "/Users/jquintero/anaconda/lib/python2.7/site-packages/pandas/tseries/index.py", line 1394, in get_value
+    raise KeyError(key)
+KeyError: '1925-3'
+'''
