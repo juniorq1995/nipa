@@ -76,15 +76,15 @@ def openDAPsst(version = '4', debug = False, anomalies = True, newFormat = False
 		'endyr'		: str(kwargs['endyr']),
 		'nbox'	 	: str(kwargs['n_mon'])
 			}
-	fp = EV['DATA'] + '/nipa/SST/' + DLargs['startmon'] + DLargs['startyr'] + \
+	sst_fp = EV['SST'] + '/' + DLargs['startmon'] + DLargs['startyr'] + \
 		'_' + DLargs['endmon'] + DLargs['endyr'] + '_nbox_' + DLargs['nbox'] + '_version' + version + 'anoms'
 	if not anomalies:
-		fp = fp + '_ssts'
+		sst_fp = sst_fp + '_ssts'
 
 	seasonal_var = namedtuple('seasonal_var', ('data','lat','lon'))
-	if isfile(fp):
+	if isfile(sst_fp):
 		#print('Using pickled SST')
-		f = open(fp)
+		f = open(sst_fp)
 		sstdata = pickle.load(f)
 		f.close()
 		var = seasonal_var(sstdata['grid'], sstdata['lat'], sstdata['lon'])
@@ -93,7 +93,7 @@ def openDAPsst(version = '4', debug = False, anomalies = True, newFormat = False
 		return sstdata
 	else:
 		print('New SST field, will save to')
-		print(fp)
+		print(sst_fp)
 
 	for kw in DLargs:
 		SSTurl = re.sub(kw, DLargs[kw], SSTurl)
@@ -130,7 +130,7 @@ def openDAPsst(version = '4', debug = False, anomalies = True, newFormat = False
 		'lat'	: sstlat
 			}
 
-	f = open(fp,'w')
+	f = open(sst_fp,'w')
 	pickle.dump(sstdata,f)
 	f.close()
 	if newFormat:
@@ -161,12 +161,12 @@ def load_slp(newFormat = False, debug = False, anomalies = True, **kwargs):
 		'nbox'		: str(kwargs['n_mon'])
 			}
 	i2m = int_to_month() #_Use in naming convention
-	fp = EV['DATA'] + '/nipa/SLP/' + i2m[kwargs['months'][0]] + \
+	slp_fp = EV['DATA'] + '/nipa/SLP/' + i2m[kwargs['months'][0]] + \
 		DLargs['startyr'] + '_' + i2m[kwargs['months'][-1]] + \
 		DLargs['endyr'] + '_nbox_' + DLargs['nbox']
 
-	if isfile(fp):
-		f = open(fp)
+	if isfile(slp_fp):
+		f = open(slp_fp)
 		slpdata = pickle.load(f)
 		f.close()
 		if newFormat:
@@ -233,9 +233,9 @@ def load_slp(newFormat = False, debug = False, anomalies = True, **kwargs):
 			'lat'	:	lat,
 			'lon'	:	lon
 			}
-	f = open(fp,'w')
+	f = open(slp_fp,'w')
 	pickle.dump(slpdata,f)
-	print('SLP data saved to %s' % (fp))
+	print('SLP data saved to %s' % (slp_fp))
 	f.close()
 	if newFormat:
 		from collections import namedtuple
@@ -250,11 +250,11 @@ def load_mei(debug = False):
 	import pickle
 	 #_Store all bash environment variables in the dict 'EV'
 
-	fp = EV['DATA'] + 'mca/mei/mei.pkl'
-	if os.path.isfile(fp):
+	mei_fp = EV['DATA'] + 'mca/mei/mei.pkl'
+	if os.path.isfile(mei_fp):
 		if debug:
 			print('Using pickled mei')
-		f = open(fp)
+		f = open(mei_fp)
 		mei = pickle.load(f)
 		f.close()
 		return mei
@@ -262,8 +262,8 @@ def load_mei(debug = False):
 		if debug:
 			print('Creating mei from .txt files')
 		#First load extended MEI
-		fp = EV['DATA'] + '/mca/mei/extended_mei.txt'
-		df = pd.read_csv(fp, sep = '\t', index_col = 0, skiprows = 7)
+		mei2_fp = EV['DATA'] + '/mca/mei/extended_mei.txt'
+		df = pd.read_csv(mei2_fp, sep = '\t', index_col = 0, skiprows = 7)
 		values = df.values.reshape(df.values.size) #reshape to 1-D
 
 		timeargs = {
@@ -278,8 +278,8 @@ def load_mei(debug = False):
 
 		#Now load MEI, and add to extended MEI (from 1950)
 		#_also had to remove some lines from bottom of textfile.
-		fp = EV['DATA'] + '/mca/mei/mei.txt'
-		df = pd.read_csv(fp, sep = '\t', index_col = 0, skiprows = 47)
+		mei3_fp = EV['DATA'] + '/mca/mei/mei.txt'
+		df = pd.read_csv(mei3_fp, sep = '\t', index_col = 0, skiprows = 47)
 		values = df.values.reshape(df.values.size)
 
 		timeargs = {
@@ -294,9 +294,9 @@ def load_mei(debug = False):
 
 		mei = pd.concat((ext_mei[:948],new_mei[:])) #only use ext_mei up to dec 1949
 
-		fp = EV['DATA'] + '/mca/mei/mei.pkl'
+		mei4_fp = EV['DATA'] + '/mca/mei/mei.pkl'
 
-		f = open(fp,'w')
+		f = open(mei4_fp,'w')
 
 		pickle.dump(mei,f)
 
