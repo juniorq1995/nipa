@@ -1,5 +1,18 @@
-Hello, this branch contains work that analyzes precipitation data collected from hundreds of weather stations over the last century.
-Once this data is collected it can be fed into another program that translates the data into a  distribution map that shows areas of the country
-with significant changes in their precipiation levels for certain seasons.
+Hello, this branch contains work that analyzes precipitation data collected from hundreds of weather stations over the last
+century. Once this data is collected it can be fed into another program that translates the data into a  distribution map 
+that shows areas of the country with significant changes in their precipiation levels for certain seasons.
 
-I would like to draw your attention 
+This branch is shared with my research advisor who created some of these programs. 
+I would like to draw your attention to the following files that I created:
+dw.py
+fList.py
+nipa_gui.py
+sList.py
+sm_gui.py
+station_module.py
+utilityF.py
+wc.py
+wc_gui2.py
+wc_gui3.py
+df2.py
+value_map.py
